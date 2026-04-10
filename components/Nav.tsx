@@ -8,6 +8,7 @@ const LINKS = [
   { href: '/',              label: 'Architecture' },
   { href: '/initiatives',  label: 'Initiative Portfolio' },
   { href: '/dependencies', label: 'Dependency Map' },
+  { href: '/story',        label: '▶ Story Mode' },
 ];
 
 export default function Nav() {
@@ -28,11 +29,13 @@ export default function Nav() {
       <div style={{ display: 'flex', gap: 4, marginLeft: 16 }}>
         {LINKS.map(l => {
           const active = path === l.href;
+          const isStory = l.href === '/story';
           return (
             <Link key={l.href} href={l.href} style={{
-              padding: '5px 14px', borderRadius: 6, fontSize: 13, fontWeight: 500,
-              color: active ? '#fff' : 'rgba(255,255,255,0.6)',
-              background: active ? 'rgba(255,255,255,0.12)' : 'transparent',
+              padding: '5px 14px', borderRadius: 6, fontSize: 13, fontWeight: isStory ? 700 : 500,
+              color: active ? '#fff' : isStory ? '#FFC220' : 'rgba(255,255,255,0.6)',
+              background: active ? (isStory ? 'rgba(255,194,32,0.2)' : 'rgba(255,255,255,0.12)') : 'transparent',
+              border: isStory && !active ? '1px solid rgba(255,194,32,0.3)' : '1px solid transparent',
               textDecoration: 'none', transition: 'all 0.15s',
             }}>
               {l.label}
