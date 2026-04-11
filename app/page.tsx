@@ -166,9 +166,19 @@ export default function ArchitecturePage() {
 
         {/* Header */}
         <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 26, fontWeight: 800, color: C.deep, letterSpacing: '-0.02em' }}>
-            Platform Architecture
-          </h1>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+            <h1 style={{ fontSize: 26, fontWeight: 800, color: C.deep, letterSpacing: '-0.02em' }}>
+              Platform Architecture
+            </h1>
+            <span title={`Built: ${process.env.NEXT_PUBLIC_BUILD_TIME}`} style={{
+              fontSize: 10, fontWeight: 600, color: '#94a3b8',
+              background: '#f1f5f9', border: '1px solid #e2e8f0',
+              borderRadius: 5, padding: '3px 8px', letterSpacing: '0.04em',
+              fontFamily: 'monospace', flexShrink: 0, marginTop: 4,
+            }}>
+              {process.env.NEXT_PUBLIC_BUILD_SHA} · {process.env.NEXT_PUBLIC_BUILD_TIME}
+            </span>
+          </div>
           <p style={{ color: C.muted, marginTop: 6, fontSize: 14 }}>
             Five Airtable bases connected as a single enterprise planning system.
             {meta && ` ${meta.l1.initiatives} initiatives · ${meta.beacon.capabilities + meta.lighthouse.capabilities} capabilities · ${meta.switchboard.crossOrgDeps} cross-org dependencies.`}
