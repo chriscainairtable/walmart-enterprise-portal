@@ -286,83 +286,124 @@ function OrgBadge({ org }: { org: string }) {
   );
 }
 
+const ORG_COLORS: Record<string, string> = {
+  Beacon: C.beacon, Lighthouse: '#7c3aed', 'Supply Chain': C.green, HR: C.amber, Marketing: C.red,
+};
+
 function FlowDiagram({ deps, onSelect, selected }: { deps: Dep[]; onSelect: (d: Dep) => void; selected: Dep | null }) {
-  const W = 700, H = 200;
+  if (deps.length === 0) {
+    return <div style={{ textAlign: 'center', color: C.muted, fontSize: 13, padding: '32px 0' }}>No dependencies match the current filters.</div>;
+  }
 
-  const ORG_POSITIONS: Record<string, number> = {
-    Beacon: 80, Lighthouse: 350, 'Supply Chain': 580, HR: 200, Marketing: 470,
-  };
-  const ORG_COLORS: Record<string, string> = {
-    Beacon: C.beacon, Lighthouse: '#7c3aed', 'Supply Chain': C.green, HR: C.amber, Marketing: C.red,
-  };
-
-  // All unique orgs present in deps
+  // Gather unique orgs
   const orgs = [...new Set([...deps.map(d => d.requestingOrg), ...deps.map(d => d.resolvingOrg)].filter(Boolean))];
 
-  // Dynamic positions if not in preset
-  const positions: Record<string, number> = { ...ORG_POSITIONS };
-  let nextX = 30;
-  orgs.forEach(org => {
-    if (positions[org] === undefined) { positions[org] = nextX; nextX += 140; }
-  });
-
-  const lcColor = (lifecycle: string) => {
-    const m = LIFECYCLE_COLORS[lifecycle];
-    return m ? m.dot : '#94a3b8';
-  };
-
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block', maxHeight: 220 }}>
-      {/* Org nodes */}
-      {orgs.map(org => {
-        const x = positions[org] ?? 50;
-        const color = ORG_COLORS[org] || C.muted;
-        const orgDeps = deps.filter(d => d.requestingOrg === org || d.resolvingOrg === org);
-        return (
-          <g key={org}>
-            <rect x={x - 50} y={60} width={100} height={44} rx={8} fill={color} opacity={0.9} />
-            <text x={x} y={84} textAnchor="middle" fontSize={12} fontWeight={700} fill="#fff">{org}</text>
-            <text x={x} y={98} textAnchor="middle" fontSize={10} fill="rgba(255,255,255,0.75)">{orgDeps.length} deps</text>
-          </g>
-        );
-      })}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+      {/* Org header row */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        {orgs.map(org => {
+          const color = ORG_COLORS[org] || C.muted;
+          const orgDepCount = deps.filter(d => d.requestingOrg === org || d.resolvingOrg === org).length;
+          return (
+            <div key={org} style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: `${color}12`, border: `1px solid ${color}30`,
+              borderRadius: 8, padding: '8px 14px',
+            }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: color }} />
+              <span style={{ fontSize: 13, fontWeight: 700, color }}>{org}</span>
+              <span style={{ fontSize: 11, color: C.muted }}>{orgDepCount} dep{orgDepCount !== 1 ? 's' : ''}</span>
+            </div>
+          );
+        })}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: C.switchboard, fontWeight: 600 }}>
+          <span style={{ fontSize: 14 }}>⟳</span> routed via L3 Switchboard
+        </div>
+      </div>
 
-      {/* Dependency lines */}
-      {deps.map((dep, i) => {
-        const rx = positions[dep.requestingOrg] ?? 50;
-        const lx = positions[dep.resolvingOrg] ?? 50;
-        if (rx === lx) return null;
-        const isSelected = selected?.id === dep.id;
-        const color = lcColor(dep.lifecycle);
-        const yOffset = 40 + (i % 3) * 8;
-        const mx = (rx + lx) / 2;
-        return (
-          <g key={dep.id} style={{ cursor: 'pointer' }} onClick={() => onSelect(dep)}>
-            <path
-              d={`M ${rx} ${60} Q ${mx} ${yOffset} ${lx} ${60}`}
-              fill="none"
-              stroke={color}
-              strokeWidth={isSelected ? 3 : 1.5}
-              strokeDasharray={dep.lifecycle === 'Declared' ? '4 3' : undefined}
-              opacity={isSelected ? 1 : 0.65}
-            />
-            {/* Label at midpoint */}
-            <text x={mx} y={yOffset - 4} textAnchor="middle" fontSize={9} fill={color} fontWeight={600}>
-              {dep.priority === 'Critical' ? '⚠ ' : ''}{dep.lifecycle}
-            </text>
-            {/* Invisible hit area */}
-            <path
-              d={`M ${rx} ${60} Q ${mx} ${yOffset} ${lx} ${60}`}
-              fill="none" stroke="transparent" strokeWidth={12}
-            />
-          </g>
-        );
-      })}
+      {/* Dependency lanes */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {deps.map(dep => {
+          const isSelected = selected?.id === dep.id;
+          const lc = LIFECYCLE_COLORS[dep.lifecycle] || { bg: '#f1f5f9', fg: '#475569', dot: '#94a3b8' };
+          const reqColor = ORG_COLORS[dep.requestingOrg] || C.muted;
+          const resColor = ORG_COLORS[dep.resolvingOrg] || C.muted;
+          const priorityColor = PRIORITY_COLORS[dep.priority] || C.muted;
+          const isCritical = dep.priority === 'Critical';
 
-      {/* Switchboard label at bottom */}
-      <text x={W / 2} y={185} textAnchor="middle" fontSize={10} fill={C.switchboard} fontWeight={700}>
-        ↑ routed through L3 Switchboard
-      </text>
-    </svg>
+          return (
+            <div
+              key={dep.id}
+              onClick={() => onSelect(dep)}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '140px 1fr 140px',
+                alignItems: 'center',
+                gap: 0,
+                background: isSelected ? '#eff6ff' : isCritical ? '#fff5f5' : '#fafafa',
+                border: `1px solid ${isSelected ? C.blue : isCritical ? '#fecaca' : C.border}`,
+                borderRadius: 8,
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                overflow: 'hidden',
+              }}
+            >
+              {/* Requesting org */}
+              <div style={{
+                padding: '10px 14px',
+                background: `${reqColor}10`,
+                borderRight: `2px solid ${reqColor}30`,
+                display: 'flex', flexDirection: 'column', gap: 2,
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: reqColor }}>{dep.requestingOrg}</span>
+                <span style={{ fontSize: 10, color: C.muted }}>requesting</span>
+              </div>
+
+              {/* Center: name + badges + arrow */}
+              <div style={{ padding: '10px 16px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {isCritical && <span style={{ fontSize: 10, color: C.red }}>⚠</span>}
+                  <span style={{ fontSize: 12, fontWeight: 600, color: C.text, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {dep.name}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {/* Arrow showing direction */}
+                  <span style={{ fontSize: 11, color: reqColor }}>→</span>
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 3,
+                    background: lc.bg, color: lc.fg,
+                    padding: '1px 7px', borderRadius: 999, fontSize: 10, fontWeight: 600,
+                  }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: lc.dot }} />
+                    {dep.lifecycle}
+                  </span>
+                  {dep.priority && (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: priorityColor }}>{dep.priority}</span>
+                  )}
+                  {dep.targetDate && (
+                    <span style={{ fontSize: 10, color: C.muted, marginLeft: 'auto' }}>
+                      {new Date(dep.targetDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Resolving org */}
+              <div style={{
+                padding: '10px 14px',
+                background: `${resColor}10`,
+                borderLeft: `2px solid ${resColor}30`,
+                display: 'flex', flexDirection: 'column', gap: 2, alignItems: 'flex-end',
+              }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: resColor }}>{dep.resolvingOrg}</span>
+                <span style={{ fontSize: 10, color: C.muted }}>resolving</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
