@@ -477,7 +477,7 @@ function SchemaPanel({
                 onClick={() => onToggleTable(table.id)}
                 style={{
                   width: '100%', display: 'flex', alignItems: 'center', gap: 8,
-                  padding: '9px 16px', background: 'none', border: 'none',
+                  padding: '9px 16px', border: 'none',
                   cursor: 'pointer', textAlign: 'left',
                   background: isExpanded ? `${color}06` : 'transparent',
                 } as React.CSSProperties}
