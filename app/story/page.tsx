@@ -277,12 +277,12 @@ function RecordsPanel({ records }: { records: AirtableRecord[] }) {
                 ))}
               </div>
             )}
-            {f['Plan to Green'] && (
+            {!!f['Plan to Green'] && (
               <div style={{ fontSize: 11, color: '#475569', marginTop: 4, lineHeight: 1.4, borderLeft: `2px solid ${C.amber}`, paddingLeft: 6 }}>
                 {(f['Plan to Green'] as string).slice(0, 120)}{(f['Plan to Green'] as string).length > 120 ? '…' : ''}
               </div>
             )}
-            {f['Description'] && (
+            {!!f['Description'] && (
               <div style={{ fontSize: 11, color: '#64748b', marginTop: 2, lineHeight: 1.4 }}>
                 {(f['Description'] as string).slice(0, 100)}{(f['Description'] as string).length > 100 ? '…' : ''}
               </div>

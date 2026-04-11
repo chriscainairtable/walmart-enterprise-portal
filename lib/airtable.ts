@@ -16,7 +16,7 @@ export function atLink(baseId: string, tableId?: string, recordId?: string) {
   return url;
 }
 
-async function fetchAll(baseId: string, tableId: string, fields: string[], filter?: string) {
+async function fetchAll(baseId: string, tableId: string, fields: string[] = [], filter?: string) {
   const records: Record<string, unknown>[] = [];
   let offset: string | undefined;
   do {
@@ -44,8 +44,8 @@ async function countTable(baseId: string, tableId: string): Promise<number> {
       { headers: { Authorization: `Bearer ${PAT}` }, next: { revalidate: 60 } }
     );
     if (!res.ok) return 0;
-    // Airtable doesn't expose total count — fetch with pagination to count
-    const records = await fetchAll(baseId, tableId, ['Name']);
+    // Airtable doesn't expose total count — fetch with pagination to count (no fields = minimal payload)
+    const records = await fetchAll(baseId, tableId, []);
     return records.length;
   } catch { return 0; }
 }
