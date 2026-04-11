@@ -56,7 +56,7 @@ function ArchMap({ highlightNodes, highlightSyncs }: { highlightNodes: NodeId[];
         }
         .sync-animated { animation: marchingAnts 0.7s linear infinite; }
       `}</style>
-      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} width="100%" style={{ display: 'block' }}>
+      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} width="100%" height={170} style={{ display: 'block' }}>
         <defs>
           {(['blue','amber','slate'] as const).map((name, i) => {
             const colors = [C.blue, C.amber, '#94a3b8'];
