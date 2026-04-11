@@ -6,7 +6,7 @@ import type { SchemaResponse, SchemaTable } from '@/app/api/schema/route';
 const C = {
   deep: '#0B2C5F', blue: '#0071CE', yellow: '#FFC220',
   green: '#16a34a', amber: '#d97706', red: '#dc2626',
-  border: '#E2E8F0', card: '#fff', bg: '#F4F7FB', muted: '#64748B',
+  border: '#E2E8F0', card: '#fff', bg: '#F4F7FB', muted: '#64748B', text: '#1E293B',
 };
 
 type Meta = {

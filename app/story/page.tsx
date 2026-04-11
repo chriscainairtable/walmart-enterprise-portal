@@ -238,7 +238,7 @@ function RecordsPanel({ records }: { records: AirtableRecord[] }) {
   const META_KEYS = ['Pillar', 'Source Org', 'Product Lifecycle Stage', 'Engineering Lead', 'Owner', 'Requesting Org', 'Resolving Org', 'Primary Product', 'Size', 'ATL/BTL'];
 
   return (
-    <div style={{ columns: 2, gap: 10 }}>
+    <div style={{ columns: '2', gap: 10 }}>
       {records.map(r => {
         const f      = r.fields;
         const name   = (f['Name'] || f['Capability Name'] || f['Dependency Name'] || f['Action Name'] || 'Untitled') as string;
