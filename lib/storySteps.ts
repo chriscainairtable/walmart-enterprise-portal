@@ -146,7 +146,7 @@ export const STEPS: StoryStep[] = [
     baseId: BASE_LIGHTHOUSE,
     query: {
       tableId: 'tblASLUQOWprw6YgF',
-      fields: ['Name', 'Status', 'Owner', 'Due Date', 'Priority'],
+      fields: ['Action Name', 'Status', 'Owner', 'Due Date', 'Priority'],
       maxRecords: 15,
     },
     highlightNodes: ['lighthouse', 'l1'],
