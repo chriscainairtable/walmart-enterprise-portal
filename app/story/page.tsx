@@ -48,7 +48,7 @@ function ArchMap({ highlightNodes, highlightSyncs }: { highlightNodes: NodeId[];
   const cy = (n: NodeDef) => n.y + n.h / 2;
 
   return (
-    <>
+    <div style={{ width: '100%', height: '100%' }}>
       <style>{`
         @keyframes marchingAnts {
           from { stroke-dashoffset: 24; }
@@ -56,7 +56,7 @@ function ArchMap({ highlightNodes, highlightSyncs }: { highlightNodes: NodeId[];
         }
         .sync-animated { animation: marchingAnts 0.7s linear infinite; }
       `}</style>
-      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} width="100%" height={170} style={{ display: 'block' }}>
+      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} preserveAspectRatio="xMidYMid meet" style={{ display: 'block', width: '100%', height: '100%' }}>
         <defs>
           {(['blue','amber','slate'] as const).map((name, i) => {
             const colors = [C.blue, C.amber, '#94a3b8'];
@@ -133,7 +133,7 @@ function ArchMap({ highlightNodes, highlightSyncs }: { highlightNodes: NodeId[];
           );
         })}
       </svg>
-    </>
+    </div>
   );
 }
 
@@ -456,12 +456,14 @@ export default function StoryPage() {
         </div>
       </div>
 
-      {/* Architecture map */}
+      {/* Architecture map — fixed height container prevents SVG from scaling to full viewport */}
       <div style={{
         background: '#0f1f3d', borderBottom: '1px solid rgba(255,255,255,0.08)',
-        padding: '8px 20px', flexShrink: 0,
+        padding: '8px 20px', flexShrink: 0, height: 160, overflow: 'hidden', boxSizing: 'border-box',
       }}>
-        <ArchMap highlightNodes={step.highlightNodes} highlightSyncs={step.highlightSyncs} />
+        <div style={{ height: '100%', overflow: 'hidden' }}>
+          <ArchMap highlightNodes={step.highlightNodes} highlightSyncs={step.highlightSyncs} />
+        </div>
       </div>
 
       {/* Content row */}
