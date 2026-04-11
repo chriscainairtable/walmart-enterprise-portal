@@ -79,7 +79,7 @@ export const STEPS: StoryStep[] = [
     act: 'Act I — Initiative Reporting',
     title: 'At-Risk Initiatives',
     narrative:
-      "Seven initiatives are currently At Risk. This is where leadership needs to act. " +
+      "19 initiatives are currently At Risk. This is where leadership needs to act. " +
       "The system surfaces Date to Green and Plan to Green alongside each status — so the conversation in the QBR isn't 'what's red' but 'here's the plan to fix it.' " +
       "Product Lead, Engineering Lead, and Finance Lead are all visible in one row. Accountability is explicit.",
     baseId: BASE_L1,
