@@ -79,15 +79,15 @@ export const STEPS: StoryStep[] = [
     act: 'Act I — Initiative Reporting',
     title: 'At-Risk Initiatives',
     narrative:
-      "19 initiatives are currently At Risk. This is where leadership needs to act. " +
-      "The system surfaces Date to Green and Plan to Green alongside each status — so the conversation in the QBR isn't 'what's red' but 'here's the plan to fix it.' " +
-      "Product Lead, Engineering Lead, and Finance Lead are all visible in one row. Accountability is explicit.",
+      "Three flagship programs are currently At Risk — Global Supply Chain Finance Visibility, Last-Mile Delivery Optimization, and Luminate Data Platform. " +
+      "Each one has a named product lead, a target Date to Green, and a written Plan to Green. " +
+      "The conversation in the QBR isn't 'what's red' — it's 'here's the owner, here's the date, here's the plan.'",
     baseId: BASE_L1,
     query: {
       tableId: 'tbl2ExbwxFOFpEtom',
-      fields: ['Name', 'Status', 'Pillar', 'Priority', 'Product Lead', 'Date to Green', 'Plan to Green'],
-      filterByFormula: '{Status}="At Risk"',
-      maxRecords: 20,
+      fields: ['Name', 'Status', 'Priority', 'Product Lead', 'Date to Green', 'Plan to Green'],
+      filterByFormula: 'AND({Status}="At Risk", NOT(OR({Name}="", FIND("Initiative ", {Name})=1)))',
+      maxRecords: 10,
     },
     highlightNodes: ['l1'],
     highlightSyncs: [],
@@ -220,9 +220,9 @@ export const STEPS: StoryStep[] = [
     act: 'Act III — Cross-Org Dependencies',
     title: 'Dependency Lifecycle Funnel',
     narrative:
-      "The lifecycle funnel shows the full pipeline: Declared → Routed → In Progress → Resolved. " +
+      "The lifecycle funnel shows the full pipeline: Declared → Routed → Acknowledged → In Progress → Resolved. " +
       "This is the operational health view — how many deps are moving versus stuck at each stage. " +
-      "Program leads can see exactly where the bottlenecks are without needing a status call.",
+      "Program leads can see exactly where the bottlenecks are without a status call.",
     baseId: BASE_SWITCHBOARD,
     query: {
       tableId: 'tblEEq5HGYSbi87W1',
@@ -240,14 +240,14 @@ export const STEPS: StoryStep[] = [
     act: 'Act III — Cross-Org Dependencies',
     title: 'Active Resolution Work',
     narrative:
-      "Dependencies In Progress or Routed are the active work surface — what's being worked on between the orgs right now. " +
-      "Resolution Notes capture what's been agreed. Target Resolution Dates create accountability. " +
+      "Active dependencies — Routed, Acknowledged, and In Progress — are the live work surface between orgs. " +
+      "Resolution Notes capture what's been agreed. Target Resolution Dates create accountability without a meeting. " +
       "When a dep resolves, it closes in Switchboard and the upstream capabilities get unblocked automatically.",
     baseId: BASE_SWITCHBOARD,
     query: {
       tableId: 'tblEEq5HGYSbi87W1',
       fields: ['Dependency Name', 'Requesting Org', 'Resolving Org', 'Priority', 'Lifecycle', 'Target Resolution Date', 'Description'],
-      filterByFormula: 'OR({Lifecycle}="In Progress", {Lifecycle}="Routed")',
+      filterByFormula: 'OR({Lifecycle}="In Progress", {Lifecycle}="Routed", {Lifecycle}="Acknowledged")',
       maxRecords: 15,
     },
     highlightNodes: ['switchboard'],
