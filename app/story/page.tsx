@@ -62,17 +62,13 @@ const SYNCS: { id: SyncId; from: NodeId; to: NodeId; color: string; dash: boolea
   { id: 'orchestrator-switchboard', from: 'orchestrator', to: 'switchboard', color: '#94a3b8', dash: true  },
 ];
 
-function ArchDiagram({ highlightNodes, highlightSyncs }: { highlightNodes: NodeId[]; highlightSyncs: SyncId[] }) {
+function ArchDiagram({ highlightNodes, highlightSyncs, compact = false }: { highlightNodes: NodeId[]; highlightSyncs: SyncId[]; compact?: boolean }) {
   const nodeMap = new Map(NODES.map(n => [n.id, n]));
   const cx = (n: NodeDef) => n.x + n.w / 2;
 
   return (
-    <div style={{ width: '100%', maxWidth: 640, margin: '0 auto' }}>
-      <style>{`
-        @keyframes ants { from { stroke-dashoffset: 20; } to { stroke-dashoffset: 0; } }
-        .ants { animation: ants 0.6s linear infinite; }
-      `}</style>
-      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
+    <div style={{ width: '100%', maxWidth: compact ? 800 : 640, margin: '0 auto' }}>
+      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ width: '100%', height: compact ? 88 : 'auto', display: 'block' }}>
         <defs>
           {['blue','amber','slate'].map((n, i) => (
             <marker key={n} id={`a-${n}`} markerWidth={7} markerHeight={7} refX={5} refY={3} orient="auto">
@@ -354,7 +350,7 @@ export default function StoryPage() {
 
   const step     = STEPS.find(s => s.id === currentId) || STEPS[0];
   const actColor = ACT_COLOR[step.act] || '#60a5fa';
-  const showArch = step.id === 12; // only full-system step shows the diagram
+  const isFullSystem = step.id === 12;
 
   const goTo = useCallback((id: number) => {
     const clamped = Math.max(1, Math.min(STEPS.length, id));
@@ -439,6 +435,16 @@ export default function StoryPage() {
         </div>
       </div>
 
+      {/* ── Persistent arch strip ── */}
+      <div style={{
+        background: '#0a1628', borderBottom: `1px solid ${C.border}`,
+        padding: '6px 24px', flexShrink: 0,
+        height: isFullSystem ? 0 : 100, overflow: 'hidden',
+        transition: 'height 0.3s ease',
+      }}>
+        <ArchDiagram highlightNodes={step.highlightNodes} highlightSyncs={step.highlightSyncs} compact />
+      </div>
+
       {/* ── Main slide content ── */}
       <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
         <div key={animKey} className="slide-in" style={{ flex: 1, display: 'flex', flexDirection: 'column', maxWidth: 900, width: '100%', margin: '0 auto', padding: '44px 40px 32px', boxSizing: 'border-box' }}>
@@ -464,8 +470,8 @@ export default function StoryPage() {
             {step.narrative}
           </p>
 
-          {/* Arch diagram — step 12 only */}
-          {showArch && (
+          {/* Arch diagram — expanded inline on step 12 only */}
+          {isFullSystem && (
             <div style={{ marginBottom: 32 }}>
               <ArchDiagram highlightNodes={step.highlightNodes} highlightSyncs={step.highlightSyncs} />
             </div>
