@@ -404,6 +404,14 @@ export default function ArchitecturePage() {
                 ))}
               </div>
             </div>
+
+            {/* Authoring flexibility callout */}
+            <div style={{ marginTop: 12, background: '#f0f9ff', border: '1px solid #bae6fd', borderRadius: 10, padding: '12px 16px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#0369a1', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 6 }}>Authoring Flexibility</div>
+              <p style={{ fontSize: 12, color: '#1e3a5f', lineHeight: 1.6, margin: 0 }}>
+                Initiatives can flow <strong>top-down</strong> (leadership authors in L1, syncs to orgs) or <strong>bottom-up</strong> (each org proposes in L2, rolls up to L1 for consolidation). Same data model, same syncs — the direction is a configuration choice that matches your planning cycle.
+              </p>
+            </div>
           </div>
         </div>
 

@@ -40,7 +40,8 @@ export const STEPS: StoryStep[] = [
     narrative:
       "Kim's team tracks every strategic initiative in L1 — the single pane of glass that blends tech and non-tech programs across the entire enterprise. " +
       "138 initiatives. One status vocabulary. One rollup view that leadership can actually trust. " +
-      "What you're seeing is live data from the Airtable base that powers the executive dashboard.",
+      "What you're seeing is live data from the Airtable base that powers the executive dashboard. " +
+      "Whether initiatives originate top-down from leadership or bottom-up from each org during AOP, they converge here.",
     baseId: BASE_L1,
     query: {
       tableId: 'tbl2ExbwxFOFpEtom',
@@ -265,7 +266,7 @@ export const STEPS: StoryStep[] = [
       "Five Airtable bases. One enterprise planning system. " +
       "L1 for portfolio visibility across tech and non-tech. Beacon and Lighthouse for delivery execution at the org level. " +
       "Orchestrator at L3 is the shared reference layer — canonical people, teams, and products distributed across every org base. Switchboard routes and resolves cross-org dependencies. " +
-      "Every sync is automated. Every status rolls up. Every dependency is tracked. " +
+      "Every sync is automated. The direction of any sync can be reversed to match the business process — top-down planning, bottom-up proposals, or both. Every status rolls up. Every dependency is tracked. " +
       "This is what Airtable looks like when it's the connective tissue for an enterprise.",
     baseId: BASE_L1,
     query: {
