@@ -75,8 +75,8 @@ const SYNCS: { id: SyncId; from: NodeId; to: NodeId; color: string; dash: boolea
 // orchestrator → switchboard: short horizontal at L3
 // orchestrator → L1: threads up through the 17px gap between beacon and future-org-base
 const SYNC_PATHS: Record<SyncId, string> = {
-  'beacon-l1':                'M 85,98 L 110,60',
-  'lighthouse-l1':            'M 495,98 L 470,60',
+  'beacon-l1':                'M 85,98 L 85,60',
+  'lighthouse-l1':            'M 495,98 L 495,60',
   'beacon-switchboard':       'M 85,150 L 85,156 L 258,156 L 258,162',
   'lighthouse-switchboard':   'M 495,150 L 495,162',
   'orchestrator-switchboard': 'M 243,188 L 258,188',
@@ -91,7 +91,7 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false, nodeCoun
 
   return (
     <div style={{ width: '100%', maxWidth: compact ? 800 : 640, margin: '0 auto' }}>
-      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ width: '100%', height: compact ? 88 : 'auto', display: 'block' }}>
+      <svg viewBox={`0 0 ${MAP_W} ${MAP_H}`} style={{ width: '100%', height: compact ? 96 : 'auto', display: 'block' }}>
         <defs>
           {['blue','amber','slate'].map((n, i) => (
             <marker key={n} id={`a-${n}`} markerWidth={7} markerHeight={7} refX={5} refY={3} orient="auto">
@@ -106,10 +106,18 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false, nodeCoun
           ))}
         </defs>
 
+        {/* Layer bands */}
+        <rect x={0} y={0}   width={MAP_W} height={90}  fill="rgba(0,113,206,0.07)" />
+        <rect x={0} y={90}  width={MAP_W} height={72}  fill="rgba(255,255,255,0.025)" />
+        <rect x={0} y={162} width={MAP_W} height={58}  fill="rgba(255,255,255,0.015)" />
+        <rect x={0} y={0}   width={2}     height={90}  fill="rgba(0,113,206,0.5)" />
+        <rect x={0} y={90}  width={2}     height={72}  fill="rgba(255,255,255,0.2)" />
+        <rect x={0} y={162} width={2}     height={58}  fill="rgba(255,255,255,0.15)" />
+
         {/* Layer labels */}
-        <text x={4} y={38}  fontSize={8} fill="rgba(255,255,255,0.3)" fontWeight={700} letterSpacing={1}>L1</text>
-        <text x={4} y={128} fontSize={8} fill="rgba(255,255,255,0.3)" fontWeight={700} letterSpacing={1}>L2</text>
-        <text x={4} y={182} fontSize={8} fill="rgba(255,255,255,0.3)" fontWeight={700} letterSpacing={1}>L3</text>
+        <text x={10} y={38}  fontSize={8} fill="rgba(255,255,255,0.5)"  fontWeight={700} letterSpacing={1.5}>L1</text>
+        <text x={10} y={128} fontSize={8} fill="rgba(255,255,255,0.35)" fontWeight={700} letterSpacing={1.5}>L2</text>
+        <text x={10} y={185} fontSize={8} fill="rgba(255,255,255,0.35)" fontWeight={700} letterSpacing={1.5}>L3</text>
 
         {/* Connections */}
         {SYNCS.map(s => {
@@ -143,17 +151,17 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false, nodeCoun
           return (
             <g key={n.id}>
               <rect x={n.x} y={n.y} width={n.w} height={n.h} rx={8}
-                fill={hl ? color : 'rgba(255,255,255,0.04)'}
-                stroke={hl ? color : 'rgba(255,255,255,0.12)'}
+                fill={hl ? color : 'rgba(255,255,255,0.07)'}
+                stroke={hl ? color : 'rgba(255,255,255,0.22)'}
                 strokeWidth={hl ? 2 : 1}
                 filter={hl ? `url(#g-${n.id})` : undefined}
               />
               <text x={cx(n)} y={n.y + 21} textAnchor="middle"
-                fontSize={11} fontWeight={700} fill={hl ? '#fff' : 'rgba(255,255,255,0.35)'}>
+                fontSize={11} fontWeight={700} fill={hl ? '#fff' : 'rgba(255,255,255,0.5)'}>
                 {n.label}
               </text>
               <text x={cx(n)} y={n.y + 37} textAnchor="middle"
-                fontSize={9} fill={hl ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.2)'}>
+                fontSize={9} fill={hl ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.38)'}>
                 {(!compact && nodeCounts?.[n.id]) ? nodeCounts[n.id] : n.sub}
               </text>
             </g>
