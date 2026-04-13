@@ -34,7 +34,7 @@ const NODE_DETAILS: Record<NodeId, { title: string; subtitle: string; color: str
     ],
   },
   beacon: {
-    title: 'Beacon Shell',
+    title: 'Beacon',
     subtitle: 'Tech org — capability tracking + Jira integration',
     color: '#0891b2',
     link: '/dependencies',
@@ -463,7 +463,7 @@ function ERDDiagram({ meta, active, onSelect }: {
   //   L3 band  y=275–490: Orchestrator left | Switchboard right
   const nodes: NodeDef[] = [
     { id: 'l1',           x: 100, y: 20,  w: 480, h: 70, label: 'L1 — Strategic Portfolio', sub: 'Executive visibility layer',  color: C.blue },
-    { id: 'beacon',       x: 40,  y: 130, w: 180, h: 70, label: 'Beacon Shell',              sub: 'Tech org · Jira-linked',     color: '#0891b2' },
+    { id: 'beacon',       x: 40,  y: 130, w: 180, h: 70, label: 'Beacon',              sub: 'Tech org · Jira-linked',     color: '#0891b2' },
     { id: 'lighthouse',   x: 460, y: 130, w: 180, h: 70, label: 'Lighthouse',                sub: 'Finance / Strategy / HR',    color: '#7c3aed' },
     { id: 'orchestrator', x: 40,  y: 345, w: 200, h: 70, label: 'Orchestrator',              sub: 'Reference data layer · L3',  color: '#475569' },
     { id: 'switchboard',  x: 260, y: 345, w: 400, h: 70, label: 'L3 — Switchboard',          sub: 'Cross-org dependencies',     color: '#d97706' },

@@ -54,7 +54,7 @@ const NODE_COLOR: Record<NodeId, string> = {
 };
 const NODES: NodeDef[] = [
   { id: 'l1',           x: 90,  y: 8,   w: 400, h: 52, label: 'L1 — Strategic Portfolio', sub: 'Executive visibility layer' },
-  { id: 'beacon',       x: 8,   y: 98,  w: 154, h: 52, label: 'Beacon Shell',              sub: 'Tech org · Jira-linked' },
+  { id: 'beacon',       x: 8,   y: 98,  w: 154, h: 52, label: 'Beacon',              sub: 'Tech org · Jira-linked' },
   { id: 'lighthouse',   x: 418, y: 98,  w: 154, h: 52, label: 'Lighthouse',                sub: 'Finance / Strategy' },
   { id: 'orchestrator', x: 8,   y: 162, w: 235, h: 52, label: 'Orchestrator',              sub: 'Reference data · L3' },
   { id: 'switchboard',  x: 258, y: 162, w: 314, h: 52, label: 'L3 — Switchboard',         sub: 'Cross-org dependencies' },

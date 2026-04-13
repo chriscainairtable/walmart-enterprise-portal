@@ -119,9 +119,9 @@ export const STEPS: StoryStep[] = [
   {
     id: 5,
     act: 'Act II — Capability Execution',
-    title: 'Beacon Shell — Tech Capabilities',
+    title: 'Beacon — Tech Capabilities',
     narrative:
-      "Beacon Shell is the tech org's delivery layer. Every capability is mapped to Jira epics and tracked through product lifecycle stages: Discover → Define → Deploy → Operate. " +
+      "Beacon is the tech org's delivery layer. Every capability is mapped to Jira epics and tracked through product lifecycle stages: Discover → Define → Deploy → Operate. " +
       "When a capability's status changes here — from In Progress to Complete — that signal flows up to L1 automatically. " +
       "No status meeting required.",
     baseId: BASE_BEACON,

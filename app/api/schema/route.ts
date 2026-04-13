@@ -7,7 +7,7 @@ const PAT = process.env.AIRTABLE_PAT!;
 
 const ALL_BASES: Record<string, string> = {
   [BASE_L1]:          'L1 Strategic Portfolio',
-  [BASE_BEACON]:      'Beacon Shell',
+  [BASE_BEACON]:      'Beacon',
   [BASE_LIGHTHOUSE]:  'Lighthouse',
   [BASE_SWITCHBOARD]: 'L3 Switchboard',
   [BASE_ORCHESTRATOR]:'Orchestrator',
