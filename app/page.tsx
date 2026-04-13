@@ -330,20 +330,20 @@ function ERDDiagram({ meta, active, onSelect }: {
     { id: 'switchboard',  x: 320, y: 330, w: 280, h: 72, label: 'L3  Switchboard',         sub: 'Cross-org dependencies', color: '#d97706' },
   ];
 
-  // Helper to get node center
-  const center = (n: NodeDef) => ({ x: n.x + n.w / 2, y: n.y + n.h / 2 });
-
-  // Arrows: [from, to, color, dash]
-  const arrows: [NodeId, NodeId, string, boolean][] = [
-    ['beacon', 'l1', C.blue, false],
-    ['lighthouse', 'l1', C.blue, false],
-    ['beacon', 'switchboard', C.amber, true],
-    ['lighthouse', 'switchboard', C.amber, true],
-    ['orchestrator', 'switchboard', '#94a3b8', true],
-    ['orchestrator', 'l1', '#94a3b8', true],
+  // Explicit orthogonal paths — no diagonals through boxes
+  // beacon/lighthouse → L1: nearly vertical, anchored to outer edges of L1
+  // beacon → switchboard: down, jog right below L2 row, into switchboard left edge
+  // lighthouse → switchboard: straight down (lighthouse x is within switchboard)
+  // orchestrator → switchboard: short horizontal at L3
+  // orchestrator → L1: threads up through the 27px gap between beacon and future-org-base
+  const paths: { d: string; color: string; dash: boolean; marker: string }[] = [
+    { d: 'M 107,160 L 130,92',                      color: C.blue,    dash: false, marker: 'blue'  },
+    { d: 'M 512,160 L 490,92',                      color: C.blue,    dash: false, marker: 'blue'  },
+    { d: 'M 107,232 L 107,281 L 320,281 L 320,330', color: C.amber,   dash: true,  marker: 'amber' },
+    { d: 'M 512,232 L 512,330',                     color: C.amber,   dash: true,  marker: 'amber' },
+    { d: 'M 290,366 L 320,366',                     color: '#94a3b8', dash: true,  marker: 'slate' },
+    { d: 'M 155,330 L 155,250 L 208,250 L 208,92',  color: '#94a3b8', dash: true,  marker: 'slate' },
   ];
-
-  const nodeMap = new Map(nodes.map(n => [n.id, n]));
 
   const getCount = (id: NodeId): string => {
     if (!meta) return '…';
@@ -379,30 +379,14 @@ function ERDDiagram({ meta, active, onSelect }: {
           })}
         </defs>
 
-        {arrows.map(([fromId, toId, color, dash], i) => {
-          const from = nodeMap.get(fromId)!;
-          const to = nodeMap.get(toId)!;
-          const fc = center(from);
-          const tc = center(to);
-          // Route edge to nearest border; handle same-row horizontal arrows
-          let fx, fy, tx, ty;
-          if (Math.abs(fc.y - tc.y) < 20) {
-            if (fc.x < tc.x) { fx = from.x + from.w; fy = fc.y; tx = to.x; ty = tc.y; }
-            else              { fx = from.x; fy = fc.y; tx = to.x + to.w; ty = tc.y; }
-          } else {
-            fx = fc.x; fy = from.y < to.y ? from.y + from.h : from.y;
-            tx = tc.x; ty = to.y < from.y ? to.y + to.h : to.y;
-          }
-          const markerColor = color === C.blue ? 'blue' : color === C.amber ? 'amber' : 'slate';
-          return (
-            <line key={i} x1={fx} y1={fy} x2={tx} y2={ty}
-              stroke={color} strokeWidth={1.5}
-              strokeDasharray={dash ? '5 4' : undefined}
-              markerEnd={`url(#arrow-${markerColor})`}
-              opacity={0.7}
-            />
-          );
-        })}
+        {paths.map((p, i) => (
+          <path key={i} d={p.d}
+            stroke={p.color} strokeWidth={1.5} fill="none"
+            strokeDasharray={p.dash ? '5 4' : undefined}
+            markerEnd={`url(#arrow-${p.marker})`}
+            opacity={0.7}
+          />
+        ))}
 
         {/* Future Org Base — dashed placeholder at L2 */}
         <g style={{ pointerEvents: 'none' }}>
