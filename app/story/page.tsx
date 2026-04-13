@@ -130,10 +130,10 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false, nodeCoun
         {/* Future Org Base — dashed placeholder at L2 */}
         <g style={{ pointerEvents: 'none' }}>
           <rect x={179} y={98} width={154} height={52} rx={8}
-            fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.2)" strokeWidth={1}
-            strokeDasharray="5 3" opacity={0.5} />
-          <text x={256} y={119} textAnchor="middle" fontSize={9} fontWeight={600} fill="rgba(255,255,255,0.3)">Future Org Base</text>
-          <text x={256} y={133} textAnchor="middle" fontSize={8} fill="rgba(255,255,255,0.18)">from Component Spine</text>
+            fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.45)" strokeWidth={1.2}
+            strokeDasharray="5 3" />
+          <text x={256} y={119} textAnchor="middle" fontSize={9} fontWeight={600} fill="rgba(255,255,255,0.65)">Supply Chain · Design · HR …</text>
+          <text x={256} y={133} textAnchor="middle" fontSize={8} fill="rgba(255,255,255,0.4)">via Component Spine</text>
         </g>
 
         {/* Nodes */}
