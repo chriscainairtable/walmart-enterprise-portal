@@ -271,7 +271,7 @@ export const STEPS: StoryStep[] = [
     query: {
       tableId: 'tbl2ExbwxFOFpEtom',
       fields: ['Name', 'Status'],
-      maxRecords: 130,
+      maxRecords: 150,
     },
     highlightNodes: ['l1', 'beacon', 'lighthouse', 'orchestrator', 'switchboard'],
     highlightSyncs: ['beacon-l1', 'lighthouse-l1', 'beacon-switchboard', 'lighthouse-switchboard', 'orchestrator-l1', 'orchestrator-switchboard'],

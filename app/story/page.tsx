@@ -29,6 +29,12 @@ const SC: Record<string, string> = {
 };
 
 type AirtableRecord = { id: string; fields: Record<string, unknown> };
+type Meta = {
+  l1: { initiatives: number };
+  beacon: { capabilities: number };
+  lighthouse: { capabilities: number };
+  switchboard: { crossOrgDeps: number };
+};
 
 function sel(v: unknown): string {
   if (!v) return '';
@@ -77,7 +83,10 @@ const SYNC_PATHS: Record<SyncId, string> = {
   'orchestrator-l1':          'M 125,162 L 125,156 L 170,156 L 170,60',
 };
 
-function ArchDiagram({ highlightNodes, highlightSyncs, compact = false }: { highlightNodes: NodeId[]; highlightSyncs: SyncId[]; compact?: boolean }) {
+function ArchDiagram({ highlightNodes, highlightSyncs, compact = false, nodeCounts }: {
+  highlightNodes: NodeId[]; highlightSyncs: SyncId[]; compact?: boolean;
+  nodeCounts?: Partial<Record<NodeId, string>>;
+}) {
   const cx = (n: NodeDef) => n.x + n.w / 2;
 
   return (
@@ -145,7 +154,7 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false }: { high
               </text>
               <text x={cx(n)} y={n.y + 37} textAnchor="middle"
                 fontSize={9} fill={hl ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.2)'}>
-                {n.sub}
+                {(!compact && nodeCounts?.[n.id]) ? nodeCounts[n.id] : n.sub}
               </text>
             </g>
           );
@@ -172,7 +181,7 @@ function SummaryPanel({ records, groupByField, actColor }: {
   const totalInv = records.reduce((s, r) => s + ((r.fields['Investment Required']    as number) || 0), 0);
 
   // Top KPI cards for status summary
-  const KPI_STATUSES = ['On Track', 'At Risk', 'Off Track', 'Complete', 'In Progress', 'Not Started'];
+  const KPI_STATUSES = ['In Flight', 'On Track', 'At Risk', 'Off Track', 'Complete', 'In Progress', 'Not Started'];
   const kpiStats = KPI_STATUSES.filter(s => counts[s]).map(s => ({ label: s, val: counts[s], color: SC[s] || actColor }));
 
   return (
@@ -365,11 +374,24 @@ export default function StoryPage() {
   const [loading, setLoading]        = useState(true);
   const [error, setError]            = useState<string | null>(null);
   const [animKey, setAnimKey]        = useState(0);
+  const [meta, setMeta]              = useState<Meta | null>(null);
   const fetchController = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    fetch('/api/meta').then(r => r.json()).then(setMeta).catch(() => {});
+  }, []);
 
   const step     = STEPS.find(s => s.id === currentId) || STEPS[0];
   const actColor = ACT_COLOR[step.act] || '#60a5fa';
   const isFullSystem = step.id === 12;
+
+  const nodeCounts: Partial<Record<NodeId, string>> | undefined = meta ? {
+    l1:           `${meta.l1.initiatives} initiatives`,
+    beacon:       `${meta.beacon.capabilities} capabilities`,
+    lighthouse:   `${meta.lighthouse.capabilities} capabilities`,
+    switchboard:  `${meta.switchboard.crossOrgDeps} deps`,
+    orchestrator: 'reference data',
+  } : undefined;
 
   const goTo = useCallback((id: number) => {
     const clamped = Math.max(1, Math.min(STEPS.length, id));
@@ -492,7 +514,7 @@ export default function StoryPage() {
           {/* Arch diagram — expanded inline on step 12 only */}
           {isFullSystem && (
             <div style={{ marginBottom: 32 }}>
-              <ArchDiagram highlightNodes={step.highlightNodes} highlightSyncs={step.highlightSyncs} />
+              <ArchDiagram highlightNodes={step.highlightNodes} highlightSyncs={step.highlightSyncs} nodeCounts={nodeCounts} />
             </div>
           )}
 
