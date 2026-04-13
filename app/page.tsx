@@ -318,41 +318,29 @@ function ERDDiagram({ meta, active, onSelect }: {
   active: NodeId | null;
   onSelect: (id: NodeId) => void;
 }) {
-  const W = 620, H = 460;
+  const W = 680, H = 490;
 
-  // Node definitions [id, x, y, w, h, label, sublabel, color]
   type NodeDef = { id: NodeId; x: number; y: number; w: number; h: number; label: string; sub: string; color: string };
+  // Layer-cake grid:
+  //   L1 band  y=0–110:   L1 node wide/centered
+  //   L2 band  y=110–275: Beacon left | Future Org center (dashed) | Lighthouse right
+  //   L3 band  y=275–490: Orchestrator left | Switchboard right
   const nodes: NodeDef[] = [
-    { id: 'l1',           x: 110, y: 20,  w: 400, h: 72, label: 'L1  Strategic Portfolio', sub: 'Single pane of glass',   color: C.blue },
-    { id: 'beacon',       x: 20,  y: 160, w: 175, h: 72, label: 'Beacon Shell',            sub: 'Tech org',               color: '#0891b2' },
-    { id: 'lighthouse',   x: 424, y: 160, w: 175, h: 72, label: 'Lighthouse',              sub: 'Non-tech org',           color: '#7c3aed' },
-    { id: 'orchestrator', x: 20,  y: 330, w: 270, h: 72, label: 'Orchestrator',            sub: 'Coordination layer',     color: '#475569' },
-    { id: 'switchboard',  x: 320, y: 330, w: 280, h: 72, label: 'L3  Switchboard',         sub: 'Cross-org dependencies', color: '#d97706' },
-  ];
-
-  // Explicit orthogonal paths — no diagonals through boxes
-  // beacon/lighthouse → L1: nearly vertical, anchored to outer edges of L1
-  // beacon → switchboard: down, jog right below L2 row, into switchboard left edge
-  // lighthouse → switchboard: straight down (lighthouse x is within switchboard)
-  // orchestrator → switchboard: short horizontal at L3
-  // orchestrator → L1: threads up through the 27px gap between beacon and future-org-base
-  const paths: { d: string; color: string; dash: boolean; marker: string }[] = [
-    { d: 'M 107,160 L 130,92',                      color: C.blue,    dash: false, marker: 'blue'  },
-    { d: 'M 512,160 L 490,92',                      color: C.blue,    dash: false, marker: 'blue'  },
-    { d: 'M 107,232 L 107,281 L 320,281 L 320,330', color: C.amber,   dash: true,  marker: 'amber' },
-    { d: 'M 512,232 L 512,330',                     color: C.amber,   dash: true,  marker: 'amber' },
-    { d: 'M 290,366 L 320,366',                     color: '#94a3b8', dash: true,  marker: 'slate' },
-    { d: 'M 155,330 L 155,250 L 208,250 L 208,92',  color: '#94a3b8', dash: true,  marker: 'slate' },
+    { id: 'l1',           x: 100, y: 20,  w: 480, h: 70, label: 'L1 — Strategic Portfolio', sub: 'Executive visibility layer',  color: C.blue },
+    { id: 'beacon',       x: 40,  y: 130, w: 180, h: 70, label: 'Beacon Shell',              sub: 'Tech org · Jira-linked',     color: '#0891b2' },
+    { id: 'lighthouse',   x: 460, y: 130, w: 180, h: 70, label: 'Lighthouse',                sub: 'Finance / Strategy / HR',    color: '#7c3aed' },
+    { id: 'orchestrator', x: 40,  y: 345, w: 200, h: 70, label: 'Orchestrator',              sub: 'Reference data layer · L3',  color: '#475569' },
+    { id: 'switchboard',  x: 260, y: 345, w: 400, h: 70, label: 'L3 — Switchboard',          sub: 'Cross-org dependencies',     color: '#d97706' },
   ];
 
   const getCount = (id: NodeId): string => {
     if (!meta) return '…';
     switch (id) {
-      case 'l1': return `${meta.l1.initiatives} initiatives`;
-      case 'beacon': return `${meta.beacon.capabilities} capabilities`;
-      case 'lighthouse': return `${meta.lighthouse.capabilities} capabilities`;
-      case 'switchboard': return `${meta.switchboard.crossOrgDeps} deps`;
-      case 'orchestrator': return 'coordination';
+      case 'l1':           return `${meta.l1.initiatives} initiatives`;
+      case 'beacon':       return `${meta.beacon.capabilities} capabilities`;
+      case 'lighthouse':   return `${meta.lighthouse.capabilities} capabilities`;
+      case 'switchboard':  return `${meta.switchboard.crossOrgDeps} deps`;
+      case 'orchestrator': return 'reference data';
     }
   };
 
@@ -362,46 +350,83 @@ function ERDDiagram({ meta, active, onSelect }: {
         System Architecture — click any base to explore
       </div>
       <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ display: 'block', padding: 16 }}>
-        {/* Layer labels */}
-        <text x={8} y={62} fontSize={9} fill="#94a3b8" fontWeight={700} letterSpacing={1}>L1</text>
-        <text x={8} y={202} fontSize={9} fill="#94a3b8" fontWeight={700} letterSpacing={1}>L2</text>
-        <text x={8} y={372} fontSize={9} fill="#94a3b8" fontWeight={700} letterSpacing={1}>L3</text>
-
-        {/* Arrows */}
         <defs>
-          {['blue','teal','amber','slate'].map((n, i) => {
-            const colors = [C.blue, '#0891b2', C.amber, '#94a3b8'];
-            return (
-              <marker key={n} id={`arrow-${n}`} markerWidth={8} markerHeight={8} refX={6} refY={3} orient="auto">
-                <path d="M0,0 L0,6 L8,3 z" fill={colors[i]} />
-              </marker>
-            );
-          })}
+          <marker id="erd-arrow-blue"     markerWidth={8} markerHeight={8} refX={7} refY={3} orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill={C.blue} />
+          </marker>
+          <marker id="erd-arrow-blue-rev" markerWidth={8} markerHeight={8} refX={1} refY={3} orient="auto-start-reverse">
+            <path d="M0,0 L0,6 L8,3 z" fill={C.blue} />
+          </marker>
+          <marker id="erd-arrow-amber"    markerWidth={8} markerHeight={8} refX={7} refY={3} orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill={C.amber} />
+          </marker>
+          <marker id="erd-arrow-slate"    markerWidth={6} markerHeight={6} refX={5} refY={2.5} orient="auto">
+            <path d="M0,0 L0,5 L6,2.5 z" fill="#94a3b8" />
+          </marker>
         </defs>
 
-        {paths.map((p, i) => (
-          <path key={i} d={p.d}
-            stroke={p.color} strokeWidth={1.5} fill="none"
-            strokeDasharray={p.dash ? '5 4' : undefined}
-            markerEnd={`url(#arrow-${p.marker})`}
-            opacity={0.7}
-          />
-        ))}
+        {/* ── Layer band backgrounds ── */}
+        <rect x={0} y={0}   width={W} height={110} fill="#eef4fc" />
+        <rect x={0} y={110} width={W} height={165} fill="#fafafa" />
+        <rect x={0} y={275} width={W} height={215} fill="#faf8f4" />
+        <line x1={0} y1={110} x2={W} y2={110} stroke="#dde6f0" strokeWidth={1} />
+        <line x1={0} y1={275} x2={W} y2={275} stroke="#e5e0d8" strokeWidth={1} />
 
-        {/* Future Org Base — dashed placeholder at L2 */}
+        {/* ── Layer labels ── */}
+        <text x={10} y={60}  fontSize={9} fontWeight={700} fill="#94a3b8" letterSpacing={1}>L1</text>
+        <text x={10} y={168} fontSize={9} fontWeight={700} fill="#94a3b8" letterSpacing={1}>L2</text>
+        <text x={10} y={383} fontSize={9} fontWeight={700} fill="#94a3b8" letterSpacing={1}>L3</text>
+
+        {/* ── 1WS: Beacon ↔ L1 — bidirectional blue, straight vertical ── */}
+        <path d="M 130,130 L 130,90"
+          stroke={C.blue} strokeWidth={2} fill="none"
+          markerStart="url(#erd-arrow-blue-rev)" markerEnd="url(#erd-arrow-blue)" />
+        <text x={138} y={114} fontSize={8} fill={C.blue} fontStyle="italic" opacity={0.85}>1WS Sync</text>
+
+        {/* ── 1WS: Lighthouse ↔ L1 — bidirectional blue, straight vertical ── */}
+        <path d="M 550,130 L 550,90"
+          stroke={C.blue} strokeWidth={2} fill="none"
+          markerStart="url(#erd-arrow-blue-rev)" markerEnd="url(#erd-arrow-blue)" />
+        <text x={558} y={114} fontSize={8} fill={C.blue} fontStyle="italic" opacity={0.85}>1WS Sync</text>
+
+        {/* ── 2WS: Beacon → Switchboard — orange dashed, elbow via gap below L2 ── */}
+        {/* Route: down from Beacon bottom, across above L3 nodes, into Switchboard left */}
+        <path d="M 130,200 L 130,310 L 265,310 L 265,345"
+          stroke={C.amber} strokeWidth={1.5} fill="none"
+          strokeDasharray="5 4" markerEnd="url(#erd-arrow-amber)" opacity={0.85} />
+        <text x={197} y={304} fontSize={8} fill={C.amber} textAnchor="middle" opacity={0.9}>2WS</text>
+
+        {/* ── 2WS: Lighthouse → Switchboard — orange dashed, straight vertical ── */}
+        <path d="M 550,200 L 550,345"
+          stroke={C.amber} strokeWidth={1.5} fill="none"
+          strokeDasharray="5 4" markerEnd="url(#erd-arrow-amber)" opacity={0.85} />
+        <text x={558} y={272} fontSize={8} fill={C.amber} opacity={0.9}>2WS</text>
+
+        {/* ── Orchestrator → Switchboard — gray dotted, short horizontal ── */}
+        <path d="M 240,380 L 260,380"
+          stroke="#94a3b8" strokeWidth={1.2} fill="none"
+          strokeDasharray="3 3" markerEnd="url(#erd-arrow-slate)" opacity={0.6} />
+
+        {/* ── Orchestrator → L1 — gray dotted, threads through Beacon/FutureOrg gap ── */}
+        {/* Route: up from Orchestrator top, left jog to x=235 (30px gap between Beacon right=220 and FutureOrg left=250), straight up to L1 bottom */}
+        <path d="M 140,345 L 140,295 L 235,295 L 235,90"
+          stroke="#94a3b8" strokeWidth={1.2} fill="none"
+          strokeDasharray="3 3" markerEnd="url(#erd-arrow-slate)" opacity={0.6} />
+
+        {/* ── Future Org Base — dashed placeholder, no connections ── */}
         <g style={{ pointerEvents: 'none' }}>
-          <rect x={222} y={160} width={175} height={72} rx={8}
+          <rect x={250} y={130} width={180} height={70} rx={8}
             fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.5}
-            strokeDasharray="6 3" opacity={0.6} />
-          <text x={309} y={186} textAnchor="middle"
+            strokeDasharray="6 3" opacity={0.55} />
+          <text x={340} y={158} textAnchor="middle"
             fontSize={11} fontWeight={600} fill="#94a3b8">Future Org Base</text>
-          <text x={309} y={200} textAnchor="middle"
+          <text x={340} y={173} textAnchor="middle"
             fontSize={9} fill="#94a3b8">from Component Spine</text>
-          <text x={309} y={216} textAnchor="middle"
-            fontSize={9} fill="#b0bec5">Supply Chain · Design · …</text>
+          <text x={340} y={187} textAnchor="middle"
+            fontSize={8} fill="#b0bec5">Supply Chain · Design · …</text>
         </g>
 
-        {/* Nodes */}
+        {/* ── Nodes ── */}
         {nodes.map(n => {
           const isActive = active === n.id;
           return (
@@ -412,16 +437,16 @@ function ERDDiagram({ meta, active, onSelect }: {
                 strokeWidth={isActive ? 2 : 1}
                 style={{ filter: isActive ? `drop-shadow(0 0 8px ${n.color}55)` : undefined }}
               />
-              <text x={n.x + n.w / 2} y={n.y + 26} textAnchor="middle"
-                fontSize={13} fontWeight={700} fill={isActive ? '#fff' : '#1e293b'}>
+              <text x={n.x + n.w / 2} y={n.y + 24} textAnchor="middle"
+                fontSize={12} fontWeight={700} fill={isActive ? '#fff' : '#1e293b'}>
                 {n.label}
               </text>
-              <text x={n.x + n.w / 2} y={n.y + 42} textAnchor="middle"
-                fontSize={10} fill={isActive ? 'rgba(255,255,255,0.75)' : '#64748b'}>
+              <text x={n.x + n.w / 2} y={n.y + 40} textAnchor="middle"
+                fontSize={9} fill={isActive ? 'rgba(255,255,255,0.75)' : '#64748b'}>
                 {n.sub}
               </text>
-              <text x={n.x + n.w / 2} y={n.y + 58} textAnchor="middle"
-                fontSize={10} fontWeight={600} fill={isActive ? 'rgba(255,255,255,0.9)' : n.color}>
+              <text x={n.x + n.w / 2} y={n.y + 56} textAnchor="middle"
+                fontSize={9} fontWeight={600} fill={isActive ? 'rgba(255,255,255,0.9)' : n.color}>
                 {getCount(n.id)}
               </text>
             </g>
