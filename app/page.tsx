@@ -558,16 +558,15 @@ function ERDDiagram({ meta, active, onSelect }: {
           strokeDasharray="3 3" markerEnd="url(#erd-arrow-slate)" opacity={0.6} />
 
         {/* ── Future Org Base — dashed placeholder, no connections ── */}
-        <g style={{ pointerEvents: 'none' }}>
+        <g style={{ pointerEvents: 'all', cursor: 'default' }}>
+          <title>{"Each org gets its own L2 base — same schema, same syncs, isolated data. Add as many as needed."}</title>
           <rect x={250} y={130} width={180} height={70} rx={8}
             fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.5}
             strokeDasharray="6 3" opacity={0.55} />
           <text x={340} y={158} textAnchor="middle"
-            fontSize={11} fontWeight={600} fill="#94a3b8">Future Org Base</text>
-          <text x={340} y={173} textAnchor="middle"
-            fontSize={9} fill="#94a3b8">from Component Spine</text>
-          <text x={340} y={187} textAnchor="middle"
-            fontSize={8} fill="#b0bec5">Supply Chain · Design · …</text>
+            fontSize={11} fontWeight={600} fill="#94a3b8">Supply Chain · Design · HR …</text>
+          <text x={340} y={175} textAnchor="middle"
+            fontSize={9} fill="#94a3b8">via Component Spine</text>
         </g>
 
         {/* ── Nodes ── */}

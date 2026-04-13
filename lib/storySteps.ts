@@ -124,7 +124,8 @@ export const STEPS: StoryStep[] = [
     narrative:
       "Beacon is the tech org's delivery layer. Every capability is mapped to Jira epics and tracked through product lifecycle stages: Discover → Define → Deploy → Operate. " +
       "When a capability's status changes here — from In Progress to Complete — that signal flows up to L1 automatically. " +
-      "No status meeting required.",
+      "No status meeting required. " +
+      "Beacon is also the template. The capability schema, the initiative sync, the dependency tables — all of this is packaged as a reusable Component Spine. Lighthouse was stood up from it. The next org follows the same pattern.",
     baseId: BASE_BEACON,
     query: {
       tableId: 'tbl0SrUcmmHaLAoja',
@@ -162,7 +163,8 @@ export const STEPS: StoryStep[] = [
     narrative:
       "The Multi Source Capabilities table is where both orgs converge. Beacon capabilities and Lighthouse capabilities flow into a single unified view in L1. " +
       "Kim doesn't need to look at two separate bases. She sees one coherent capability dashboard with source org labels and status rolled up from the actual delivery teams. " +
-      "This is the 1WS pattern — one-way sync from L2 to L1.",
+      "This is the 1WS pattern — one-way sync from L2 to L1. " +
+      "The same pattern scales to any number of org bases — Supply Chain, Design, HR — each with its own L2 instance, all rolling up into one L1 view.",
     baseId: BASE_L1,
     query: {
       tableId: 'tbl0z89Mlv0BEKSnU',
@@ -267,6 +269,7 @@ export const STEPS: StoryStep[] = [
       "L1 for portfolio visibility across tech and non-tech. Beacon and Lighthouse for delivery execution at the org level. " +
       "Orchestrator at L3 is the shared reference layer — canonical people, teams, and products distributed across every org base. Switchboard routes and resolves cross-org dependencies. " +
       "Every sync is automated. The direction of any sync can be reversed to match the business process — top-down planning, bottom-up proposals, or both. Every status rolls up. Every dependency is tracked. " +
+      "The 'Supply Chain · Design · HR …' slot in the diagram isn't hypothetical — it's the next org that runs Component Spine. Same schema, same sync config, plugged in in a day. " +
       "This is what Airtable looks like when it's the connective tissue for an enterprise.",
     baseId: BASE_L1,
     query: {
