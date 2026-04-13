@@ -49,9 +49,9 @@ const NODE_COLOR: Record<NodeId, string> = {
 const NODES: NodeDef[] = [
   { id: 'l1',           x: 90,  y: 8,   w: 400, h: 52, label: 'L1 — Strategic Portfolio', sub: 'Executive visibility layer' },
   { id: 'beacon',       x: 8,   y: 98,  w: 154, h: 52, label: 'Beacon Shell',              sub: 'Tech org · Jira-linked' },
-  { id: 'orchestrator', x: 213, y: 98,  w: 154, h: 52, label: 'Orchestrator',              sub: 'Coordination layer' },
   { id: 'lighthouse',   x: 418, y: 98,  w: 154, h: 52, label: 'Lighthouse',                sub: 'Finance / Strategy' },
-  { id: 'switchboard',  x: 90,  y: 152, w: 400, h: 52, label: 'L3 — Switchboard',         sub: 'Cross-org dependencies' },
+  { id: 'orchestrator', x: 8,   y: 152, w: 235, h: 52, label: 'Orchestrator',              sub: 'Reference data · L3' },
+  { id: 'switchboard',  x: 258, y: 152, w: 314, h: 52, label: 'L3 — Switchboard',         sub: 'Cross-org dependencies' },
 ];
 const SYNCS: { id: SyncId; from: NodeId; to: NodeId; color: string; dash: boolean }[] = [
   { id: 'beacon-l1',                from: 'beacon',       to: 'l1',          color: '#60a5fa', dash: false },
@@ -93,12 +93,20 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false }: { high
           const from = nodeMap.get(s.from)!;
           const to   = nodeMap.get(s.to)!;
           const hl   = highlightSyncs.includes(s.id);
-          const fy   = from.y < to.y ? from.y + from.h : from.y;
-          const ty   = to.y < from.y ? to.y + to.h     : to.y;
-          const mk   = s.color === '#60a5fa' ? 'blue' : s.color === '#fbbf24' ? 'amber' : 'slate';
+          const fc   = { x: cx(from), y: from.y + from.h / 2 };
+          const tc   = { x: cx(to),   y: to.y   + to.h   / 2 };
+          let x1, y1, x2, y2;
+          if (Math.abs(fc.y - tc.y) < 20) {
+            if (fc.x < tc.x) { x1 = from.x + from.w; y1 = fc.y; x2 = to.x;           y2 = tc.y; }
+            else              { x1 = from.x;           y1 = fc.y; x2 = to.x + to.w; y2 = tc.y; }
+          } else {
+            x1 = cx(from); y1 = from.y < to.y ? from.y + from.h : from.y;
+            x2 = cx(to);   y2 = to.y < from.y ? to.y   + to.h   : to.y;
+          }
+          const mk = s.color === '#60a5fa' ? 'blue' : s.color === '#fbbf24' ? 'amber' : 'slate';
           return (
             <line key={s.id}
-              x1={cx(from)} y1={fy} x2={cx(to)} y2={ty}
+              x1={x1} y1={y1} x2={x2} y2={y2}
               stroke={s.color} strokeWidth={hl ? 2.5 : 1}
               strokeDasharray="6 4"
               markerEnd={`url(#a-${mk})`}
@@ -107,6 +115,15 @@ function ArchDiagram({ highlightNodes, highlightSyncs, compact = false }: { high
             />
           );
         })}
+
+        {/* Future Org Base — dashed placeholder at L2 */}
+        <g style={{ pointerEvents: 'none' }}>
+          <rect x={179} y={98} width={154} height={52} rx={8}
+            fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.2)" strokeWidth={1}
+            strokeDasharray="5 3" opacity={0.5} />
+          <text x={256} y={119} textAnchor="middle" fontSize={9} fontWeight={600} fill="rgba(255,255,255,0.3)">Future Org Base</text>
+          <text x={256} y={133} textAnchor="middle" fontSize={8} fill="rgba(255,255,255,0.18)">from Component Spine</text>
+        </g>
 
         {/* Nodes */}
         {NODES.map(n => {

@@ -263,8 +263,8 @@ export const STEPS: StoryStep[] = [
     title: 'Enterprise Airtable at Scale',
     narrative:
       "Five Airtable bases. One enterprise planning system. " +
-      "L1 for portfolio visibility across tech and non-tech. Beacon and Lighthouse for delivery execution. " +
-      "Orchestrator for routing and escalation logic. Switchboard for cross-org dependency management. " +
+      "L1 for portfolio visibility across tech and non-tech. Beacon and Lighthouse for delivery execution at the org level. " +
+      "Orchestrator at L3 is the shared reference layer — canonical people, teams, and products distributed across every org base. Switchboard routes and resolves cross-org dependencies. " +
       "Every sync is automated. Every status rolls up. Every dependency is tracked. " +
       "This is what Airtable looks like when it's the connective tissue for an enterprise.",
     baseId: BASE_L1,
