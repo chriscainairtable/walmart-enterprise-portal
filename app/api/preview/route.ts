@@ -1,5 +1,7 @@
 import { NextRequest } from 'next/server';
 
+export const revalidate = 60;
+
 const PAT = process.env.AIRTABLE_PAT!;
 
 const BASE_L1          = 'appCNBYNGcbSj7fNq';
@@ -17,7 +19,7 @@ async function fetchAll(baseId: string, tableId: string, fields: string[]) {
     params.set('pageSize', '100');
     const res = await fetch(
       `https://api.airtable.com/v0/${baseId}/${tableId}?${params}`,
-      { headers: { Authorization: `Bearer ${PAT}` }, next: { revalidate: 60 } }
+      { headers: { Authorization: `Bearer ${PAT}` }, cache: 'no-store' }
     );
     if (!res.ok) break;
     const data = await res.json();

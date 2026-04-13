@@ -1,5 +1,7 @@
 import { STEPS } from '@/lib/storySteps';
 
+export const revalidate = 60;
+
 const PAT = process.env.AIRTABLE_PAT!;
 
 export async function GET(
@@ -43,7 +45,7 @@ async function fetchStepData(
 
     const res = await fetch(
       `https://api.airtable.com/v0/${baseId}/${query.tableId}?${p}`,
-      { headers: { Authorization: `Bearer ${PAT}` }, next: { revalidate: 60 } }
+      { headers: { Authorization: `Bearer ${PAT}` }, cache: 'no-store' }
     );
     if (!res.ok) break;
     const data = await res.json();

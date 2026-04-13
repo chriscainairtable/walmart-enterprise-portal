@@ -3,6 +3,8 @@ import {
   BASE_SWITCHBOARD, BASE_ORCHESTRATOR,
 } from '@/lib/airtable';
 
+export const revalidate = 300;
+
 const PAT = process.env.AIRTABLE_PAT!;
 
 const ALL_BASES: Record<string, string> = {
@@ -37,7 +39,7 @@ export type SchemaResponse = {
 async function fetchBaseSchema(baseId: string): Promise<SchemaTable[]> {
   const res = await fetch(
     `https://api.airtable.com/v0/meta/bases/${baseId}/tables`,
-    { headers: { Authorization: `Bearer ${PAT}` }, next: { revalidate: 300 } }
+    { headers: { Authorization: `Bearer ${PAT}` }, cache: 'no-store' }
   );
   if (!res.ok) return [];
   const data = await res.json();

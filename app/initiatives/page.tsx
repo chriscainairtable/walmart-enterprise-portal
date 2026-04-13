@@ -95,6 +95,7 @@ export default function InitiativesPage() {
 
   // KPIs
   const total = filtered.length;
+  const inFlight = filtered.filter(i => i.status === 'In Flight').length;
   const onTrack = filtered.filter(i => i.status === 'On Track').length;
   const atRisk = filtered.filter(i => i.status === 'At Risk').length;
   const offTrack = filtered.filter(i => i.status === 'Off Track').length;
@@ -154,6 +155,7 @@ export default function InitiativesPage() {
       <div style={{ display: 'flex', gap: 10, padding: '12px 24px', flexShrink: 0 }}>
         {[
           { label: 'Total Initiatives', value: total, color: C.text },
+          { label: 'In Flight', value: `${inFlight} (${total ? Math.round(inFlight/total*100) : 0}%)`, color: C.blue },
           { label: 'On Track', value: `${onTrack} (${total ? Math.round(onTrack/total*100) : 0}%)`, color: C.green },
           { label: 'At Risk', value: `${atRisk} (${total ? Math.round(atRisk/total*100) : 0}%)`, color: C.amber },
           { label: 'Off Track', value: `${offTrack} (${total ? Math.round(offTrack/total*100) : 0}%)`, color: C.red },

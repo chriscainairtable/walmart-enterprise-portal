@@ -1,5 +1,7 @@
 import { fetchInitiatives, fetchMSC } from '@/lib/airtable';
 
+export const revalidate = 60;
+
 export async function GET() {
   try {
     const [initiatives, msc] = await Promise.all([fetchInitiatives(), fetchMSC()]);
