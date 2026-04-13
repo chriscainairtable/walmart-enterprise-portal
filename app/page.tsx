@@ -63,14 +63,16 @@ const NODE_DETAILS: Record<NodeId, { title: string; subtitle: string; color: str
   },
   orchestrator: {
     title: 'L3 Orchestrator',
-    subtitle: 'Coordination layer — no interface extension needed',
+    subtitle: 'Reference data layer — people, teams, products, projects',
     color: '#475569',
     link: 'https://airtabledemo.com/appbcfht8yKGA4uQk',
-    linkLabel: 'Open in Airtable ↗',
+    linkLabel: 'Open Phone Book ↗',
     bullets: () => [
-      'Manages routing + escalation logic between L2 orgs',
-      'No public-facing extension — internal coordination only',
-      'Cross-org signals flow through here to Switchboard',
+      '10 people · 9 teams · 8 products · 7 Jira projects',
+      'Canonical reference data distributed across all org bases',
+      'People Directory: search by org, role, or pillar',
+      'Teams + Products: delivery org structure at a glance',
+      'Jira Projects: cross-referenced to Beacon capabilities',
     ],
   },
   switchboard: {

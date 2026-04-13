@@ -39,13 +39,13 @@ export const STEPS: StoryStep[] = [
     title: 'The Portfolio at a Glance',
     narrative:
       "Kim's team tracks every strategic initiative in L1 — the single pane of glass that blends tech and non-tech programs across the entire enterprise. " +
-      "130 initiatives. One status vocabulary. One rollup view that leadership can actually trust. " +
+      "138 initiatives. One status vocabulary. One rollup view that leadership can actually trust. " +
       "What you're seeing is live data from the Airtable base that powers the executive dashboard.",
     baseId: BASE_L1,
     query: {
       tableId: 'tbl2ExbwxFOFpEtom',
       fields: ['Name', 'Status', 'Pillar', 'Priority', 'Source Org'],
-      maxRecords: 130,
+      maxRecords: 150,
     },
     highlightNodes: ['l1'],
     highlightSyncs: [],
@@ -79,7 +79,7 @@ export const STEPS: StoryStep[] = [
     act: 'Act I — Initiative Reporting',
     title: 'At-Risk Initiatives',
     narrative:
-      "Three flagship programs are currently At Risk — Global Supply Chain Finance Visibility, Last-Mile Delivery Optimization, and Luminate Data Platform. " +
+      "Four initiatives are currently At Risk — Global Supply Chain Finance Visibility, Last-Mile Delivery Optimization, Luminate Data Platform — Supplier Analytics, and Cross-Segment Financial Planning Consolidation. " +
       "Each one has a named product lead, a target Date to Green, and a written Plan to Green. " +
       "The conversation in the QBR isn't 'what's red' — it's 'here's the owner, here's the date, here's the plan.'",
     baseId: BASE_L1,

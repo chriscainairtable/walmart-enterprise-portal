@@ -181,7 +181,7 @@ function SummaryPanel({ records, groupByField, actColor }: {
   const totalInv = records.reduce((s, r) => s + ((r.fields['Investment Required']    as number) || 0), 0);
 
   // Top KPI cards for status summary
-  const KPI_STATUSES = ['In Flight', 'On Track', 'At Risk', 'Off Track', 'Complete', 'In Progress', 'Not Started'];
+  const KPI_STATUSES = ['In Flight', 'On Track', 'At Risk', 'Approved', 'Off Track', 'Complete', 'In Progress', 'Not Started'];
   const kpiStats = KPI_STATUSES.filter(s => counts[s]).map(s => ({ label: s, val: counts[s], color: SC[s] || actColor }));
 
   return (
