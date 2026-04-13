@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import type { SchemaResponse, SchemaTable } from '@/app/api/schema/route';
 
@@ -115,6 +115,111 @@ const FIELD_TYPE_ICON: Record<string, string> = {
   button: '▶',
 };
 
+type PreviewType = 'initiatives' | 'programs' | 'msc' | 'beacon-epics' | 'lighthouse-actions' | 'deps';
+type PreviewRecord = Record<string, unknown>;
+
+const PREVIEW_CONFIG: Record<PreviewType, {
+  title: string; color: string;
+  columns: { key: string; label: string; bold?: boolean; badge?: boolean; mono?: boolean; date?: boolean }[];
+}> = {
+  initiatives: {
+    title: 'Initiatives', color: C.blue,
+    columns: [
+      { key: 'name',     label: 'Name',     bold: true },
+      { key: 'status',   label: 'Status',   badge: true },
+      { key: 'org',      label: 'Org' },
+      { key: 'priority', label: 'Priority', badge: true },
+      { key: 'pillar',   label: 'Pillar' },
+      { key: 'atlbtl',   label: 'ATL/BTL' },
+    ],
+  },
+  programs: {
+    title: 'Programs', color: C.blue,
+    columns: [
+      { key: 'name',     label: 'Program',  bold: true },
+      { key: 'status',   label: 'Status',   badge: true },
+      { key: 'priority', label: 'Priority', badge: true },
+      { key: 'sponsor',  label: 'Sponsor' },
+    ],
+  },
+  msc: {
+    title: 'MSC Capabilities', color: '#0891b2',
+    columns: [
+      { key: 'name',   label: 'Capability', bold: true },
+      { key: 'status', label: 'Status',     badge: true },
+      { key: 'org',    label: 'Source Org' },
+      { key: 'stage',  label: 'Stage',      badge: true },
+      { key: 'size',   label: 'Size' },
+    ],
+  },
+  'beacon-epics': {
+    title: 'Beacon Jira Epics', color: '#0891b2',
+    columns: [
+      { key: 'jiraKey',    label: 'Key',      mono: true },
+      { key: 'name',       label: 'Epic',     bold: true },
+      { key: 'status',     label: 'Status',   badge: true },
+      { key: 'priority',   label: 'Priority', badge: true },
+      { key: 'assignee',   label: 'Assignee' },
+      { key: 'targetDate', label: 'Target',   date: true },
+    ],
+  },
+  'lighthouse-actions': {
+    title: 'Lighthouse Actions', color: '#7c3aed',
+    columns: [
+      { key: 'name',     label: 'Action',   bold: true },
+      { key: 'status',   label: 'Status',   badge: true },
+      { key: 'priority', label: 'Priority', badge: true },
+      { key: 'owner',    label: 'Owner' },
+      { key: 'dueDate',  label: 'Due',      date: true },
+    ],
+  },
+  deps: {
+    title: 'Cross-Org Dependencies', color: C.amber,
+    columns: [
+      { key: 'name',         label: 'Dependency',    bold: true },
+      { key: 'lifecycle',    label: 'Lifecycle',      badge: true },
+      { key: 'priority',     label: 'Priority',       badge: true },
+      { key: 'requestingOrg',label: 'Requesting Org' },
+      { key: 'resolvingOrg', label: 'Resolving Org' },
+      { key: 'targetDate',   label: 'Target',         date: true },
+    ],
+  },
+};
+
+const STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
+  'On Track':    { bg: '#dcfce7', fg: '#16a34a' },
+  'At Risk':     { bg: '#fef9c3', fg: '#a16207' },
+  'Off Track':   { bg: '#fee2e2', fg: '#dc2626' },
+  'Complete':    { bg: '#dbeafe', fg: '#1d4ed8' },
+  'Approved':    { bg: '#f3e8ff', fg: '#7c3aed' },
+  'In Progress': { bg: '#fff7ed', fg: '#c2410c' },
+  'In Flight':   { bg: '#fff7ed', fg: '#c2410c' },
+  'Not Started': { bg: '#f1f5f9', fg: '#475569' },
+  'Blocked':     { bg: '#fee2e2', fg: '#dc2626' },
+  'Declared':    { bg: '#f1f5f9', fg: '#64748b' },
+  'Routed':      { bg: '#ede9fe', fg: '#6d28d9' },
+  'Acknowledged':{ bg: '#eff6ff', fg: '#1d4ed8' },
+  'Resolved':    { bg: '#dcfce7', fg: '#16a34a' },
+  'Confirmed':   { bg: '#dbeafe', fg: '#1d4ed8' },
+  'High':        { bg: '#fee2e2', fg: '#dc2626' },
+  'Critical':    { bg: '#fce7f3', fg: '#9d174d' },
+  'Medium':      { bg: '#fef9c3', fg: '#a16207' },
+  'Low':         { bg: '#f1f5f9', fg: '#475569' },
+  'P1':          { bg: '#fee2e2', fg: '#dc2626' },
+  'ATL':         { bg: '#dbeafe', fg: '#1d4ed8' },
+  'BTL':         { bg: '#f1f5f9', fg: '#475569' },
+  'Discover':    { bg: '#ede9fe', fg: '#6d28d9' },
+  'Define':      { bg: '#fef9c3', fg: '#a16207' },
+  'Deploy':      { bg: '#dcfce7', fg: '#16a34a' },
+  'Operate':     { bg: '#dbeafe', fg: '#1d4ed8' },
+};
+
+function fmtDate(s: unknown): string {
+  if (!s) return '—';
+  try { return new Date(String(s)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+  catch { return String(s); }
+}
+
 export default function ArchitecturePage() {
   const [meta, setMeta] = useState<Meta | null>(null);
   const [active, setActive] = useState<NodeId | null>('l1');
@@ -122,10 +227,24 @@ export default function ArchitecturePage() {
   const [schemaCache, setSchemaCache] = useState<Partial<Record<NodeId, SchemaResponse>>>({});
   const [schemaLoading, setSchemaLoading] = useState(false);
   const [expandedTables, setExpandedTables] = useState<Set<string>>(new Set());
+  const [preview, setPreview] = useState<PreviewType | null>(null);
+  const [previewData, setPreviewData] = useState<PreviewRecord[]>([]);
+  const [previewLoading, setPreviewLoading] = useState(false);
 
   useEffect(() => {
     fetch('/api/meta').then(r => r.json()).then(setMeta).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!preview) return;
+    setPreviewLoading(true);
+    setPreviewData([]);
+    fetch(`/api/preview?type=${preview}`)
+      .then(r => r.json())
+      .then(d => setPreviewData(Array.isArray(d) ? d : []))
+      .catch(() => {})
+      .finally(() => setPreviewLoading(false));
+  }, [preview]);
 
   const loadSchema = useCallback((nodeId: NodeId) => {
     if (schemaCache[nodeId]) return;
@@ -288,26 +407,41 @@ export default function ArchitecturePage() {
           </div>
         </div>
 
-        {/* Bottom stat strip */}
+        {/* Bottom stat strip — click to preview */}
         {meta && (
           <div style={{ marginTop: 32, display: 'flex', gap: 12 }}>
-            {[
-              { label: 'Initiatives', value: meta.l1.initiatives, color: C.blue },
-              { label: 'Programs', value: meta.l1.programs, color: C.blue },
-              { label: 'MSC Capabilities', value: meta.l1.mscCapabilities, color: '#0891b2' },
-              { label: 'Beacon Epics', value: meta.beacon.jiraEpics, color: '#0891b2' },
-              { label: 'Lighthouse Actions', value: meta.lighthouse.actions, color: '#7c3aed' },
-              { label: 'Cross-Org Deps', value: meta.switchboard.crossOrgDeps, color: C.amber },
-            ].map(s => (
-              <div key={s.label} style={{
+            {([
+              { label: 'Initiatives',       value: meta.l1.initiatives,        color: C.blue,     type: 'initiatives'        as PreviewType },
+              { label: 'Programs',          value: meta.l1.programs,           color: C.blue,     type: 'programs'           as PreviewType },
+              { label: 'MSC Capabilities',  value: meta.l1.mscCapabilities,    color: '#0891b2',  type: 'msc'                as PreviewType },
+              { label: 'Beacon Epics',      value: meta.beacon.jiraEpics,      color: '#0891b2',  type: 'beacon-epics'       as PreviewType },
+              { label: 'Lighthouse Actions',value: meta.lighthouse.actions,    color: '#7c3aed',  type: 'lighthouse-actions' as PreviewType },
+              { label: 'Cross-Org Deps',    value: meta.switchboard.crossOrgDeps, color: C.amber, type: 'deps'              as PreviewType },
+            ] as { label: string; value: number; color: string; type: PreviewType }[]).map(s => (
+              <button key={s.label} onClick={() => setPreview(s.type)} style={{
                 flex: 1, background: C.card, border: `1px solid ${C.border}`, borderRadius: 10,
-                padding: '12px 16px', textAlign: 'center',
-              }}>
+                padding: '12px 16px', textAlign: 'center', cursor: 'pointer',
+                transition: 'border-color 0.15s, box-shadow 0.15s',
+              }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.borderColor = s.color; e.currentTarget.style.boxShadow = `0 0 0 3px ${s.color}18`; }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.boxShadow = 'none'; }}
+              >
                 <div style={{ fontSize: 24, fontWeight: 800, color: s.color }}>{s.value}</div>
                 <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>{s.label}</div>
-              </div>
+                <div style={{ fontSize: 9, color: s.color, marginTop: 3, opacity: 0.7, letterSpacing: '0.04em' }}>click to preview</div>
+              </button>
             ))}
           </div>
+        )}
+
+        {/* Preview lightbox */}
+        {preview && (
+          <PreviewLightbox
+            type={preview}
+            data={previewData}
+            loading={previewLoading}
+            onClose={() => setPreview(null)}
+          />
         )}
       </div>
     </div>
@@ -562,6 +696,176 @@ function SchemaPanel({
             </div>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// ── Preview Lightbox ──────────────────────────────────────────────────────────
+function PreviewLightbox({ type, data, loading, onClose }: {
+  type: PreviewType;
+  data: PreviewRecord[];
+  loading: boolean;
+  onClose: () => void;
+}) {
+  const cfg = PREVIEW_CONFIG[type];
+
+  // Close on Escape
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [onClose]);
+
+  const [search, setSearch] = useState('');
+  const filtered = search
+    ? data.filter(r => Object.values(r).some(v => String(v ?? '').toLowerCase().includes(search.toLowerCase())))
+    : data;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 1000,
+        background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        padding: 32,
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          background: C.card, borderRadius: 14, boxShadow: '0 24px 64px rgba(0,0,0,0.2)',
+          width: '100%', maxWidth: 960, maxHeight: '80vh',
+          display: 'flex', flexDirection: 'column', overflow: 'hidden',
+          border: `1px solid ${C.border}`,
+        }}
+      >
+        {/* Header */}
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '14px 20px', borderBottom: `1px solid ${C.border}`,
+          background: `linear-gradient(135deg, ${cfg.color}12, ${cfg.color}04)`,
+          flexShrink: 0,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 10, height: 10, borderRadius: '50%', background: cfg.color }} />
+            <span style={{ fontWeight: 700, fontSize: 15, color: C.text }}>{cfg.title}</span>
+            {!loading && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, color: cfg.color,
+                background: `${cfg.color}15`, border: `1px solid ${cfg.color}30`,
+                borderRadius: 5, padding: '2px 8px',
+              }}>
+                {filtered.length}{search ? ` of ${data.length}` : ''} records
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Filter…"
+              autoFocus
+              style={{
+                fontSize: 12, border: `1px solid ${C.border}`, borderRadius: 7,
+                padding: '5px 10px', width: 180, color: C.text,
+                background: C.card, outline: 'none',
+              }}
+            />
+            <button onClick={onClose} style={{
+              background: 'none', border: `1px solid ${C.border}`, borderRadius: 7,
+              width: 30, height: 30, cursor: 'pointer', color: C.muted,
+              fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>×</button>
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ flex: 1, overflow: 'auto' }}>
+          {loading && (
+            <div style={{ padding: 40, textAlign: 'center', color: C.muted, fontSize: 13 }}>
+              <div style={{
+                width: 20, height: 20, border: `2px solid ${cfg.color}44`,
+                borderTopColor: cfg.color, borderRadius: '50%',
+                animation: 'spin 0.7s linear infinite',
+                display: 'inline-block', marginBottom: 10,
+              }} />
+              <div>Loading live data…</div>
+              <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            </div>
+          )}
+          {!loading && filtered.length === 0 && (
+            <div style={{ padding: 40, textAlign: 'center', color: C.muted, fontSize: 13 }}>
+              {search ? 'No records match this filter.' : 'No records found.'}
+            </div>
+          )}
+          {!loading && filtered.length > 0 && (
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: '#F8FAFC', position: 'sticky', top: 0 }}>
+                  {cfg.columns.map(col => (
+                    <th key={col.key} style={{
+                      padding: '9px 14px', textAlign: 'left',
+                      fontWeight: 600, color: C.muted, fontSize: 11,
+                      whiteSpace: 'nowrap', borderBottom: `1px solid ${C.border}`,
+                    }}>
+                      {col.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((row, i) => (
+                  <tr key={String(row.id ?? i)} style={{ borderBottom: `1px solid ${C.border}` }}
+                    onMouseEnter={(e: React.MouseEvent<HTMLTableRowElement>) => e.currentTarget.style.background = '#F8FAFC'}
+                    onMouseLeave={(e: React.MouseEvent<HTMLTableRowElement>) => e.currentTarget.style.background = 'transparent'}
+                  >
+                    {cfg.columns.map(col => {
+                      const val = row[col.key];
+                      const str = val == null || val === '' ? '—' : String(val);
+                      const sc = STATUS_COLORS[str];
+                      return (
+                        <td key={col.key} style={{ padding: '8px 14px', maxWidth: col.bold ? 280 : 180, verticalAlign: 'middle' }}>
+                          {col.badge && sc ? (
+                            <span style={{
+                              display: 'inline-block', padding: '2px 8px', borderRadius: 9999,
+                              fontSize: 11, fontWeight: 600,
+                              background: sc.bg, color: sc.fg, whiteSpace: 'nowrap',
+                            }}>{str}</span>
+                          ) : col.mono ? (
+                            <span style={{
+                              fontFamily: 'monospace', fontSize: 11,
+                              background: '#F1F5F9', color: C.deep,
+                              padding: '2px 6px', borderRadius: 4, fontWeight: 600,
+                            }}>{str}</span>
+                          ) : col.date ? (
+                            <span style={{ color: C.muted, whiteSpace: 'nowrap' }}>{fmtDate(val)}</span>
+                          ) : (
+                            <span style={{
+                              fontWeight: col.bold ? 600 : 400,
+                              color: col.bold ? C.text : C.muted,
+                              overflow: 'hidden', textOverflow: 'ellipsis',
+                              display: 'block', whiteSpace: 'nowrap',
+                            }}>{str}</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '10px 20px', borderTop: `1px solid ${C.border}`,
+          fontSize: 11, color: C.muted, background: '#F8FAFC', flexShrink: 0,
+        }}>
+          Live data · Esc to close
+        </div>
       </div>
     </div>
   );
