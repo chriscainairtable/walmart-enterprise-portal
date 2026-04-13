@@ -323,11 +323,11 @@ function ERDDiagram({ meta, active, onSelect }: {
   // Node definitions [id, x, y, w, h, label, sublabel, color]
   type NodeDef = { id: NodeId; x: number; y: number; w: number; h: number; label: string; sub: string; color: string };
   const nodes: NodeDef[] = [
-    { id: 'l1',           x: 110, y: 20,  w: 400, h: 72, label: 'L1  Strategic Portfolio', sub: 'Single pane of glass',  color: C.blue },
-    { id: 'beacon',       x: 20,  y: 160, w: 175, h: 72, label: 'Beacon Shell',            sub: 'Tech org',              color: '#0891b2' },
-    { id: 'orchestrator', x: 222, y: 160, w: 175, h: 72, label: 'Orchestrator',            sub: 'Coordination layer',    color: '#475569' },
-    { id: 'lighthouse',   x: 424, y: 160, w: 175, h: 72, label: 'Lighthouse',              sub: 'Non-tech org',          color: '#7c3aed' },
-    { id: 'switchboard',  x: 110, y: 330, w: 400, h: 72, label: 'L3  Switchboard',         sub: 'Cross-org dependencies', color: '#d97706' },
+    { id: 'l1',           x: 110, y: 20,  w: 400, h: 72, label: 'L1  Strategic Portfolio', sub: 'Single pane of glass',   color: C.blue },
+    { id: 'beacon',       x: 20,  y: 160, w: 175, h: 72, label: 'Beacon Shell',            sub: 'Tech org',               color: '#0891b2' },
+    { id: 'lighthouse',   x: 424, y: 160, w: 175, h: 72, label: 'Lighthouse',              sub: 'Non-tech org',           color: '#7c3aed' },
+    { id: 'orchestrator', x: 20,  y: 330, w: 270, h: 72, label: 'Orchestrator',            sub: 'Coordination layer',     color: '#475569' },
+    { id: 'switchboard',  x: 320, y: 330, w: 280, h: 72, label: 'L3  Switchboard',         sub: 'Cross-org dependencies', color: '#d97706' },
   ];
 
   // Helper to get node center
@@ -384,11 +384,15 @@ function ERDDiagram({ meta, active, onSelect }: {
           const to = nodeMap.get(toId)!;
           const fc = center(from);
           const tc = center(to);
-          // Route edge to nearest border
-          const fx = fc.x;
-          const fy = from.y < to.y ? from.y + from.h : from.y;
-          const tx = tc.x;
-          const ty = to.y < from.y ? to.y + to.h : to.y;
+          // Route edge to nearest border; handle same-row horizontal arrows
+          let fx, fy, tx, ty;
+          if (Math.abs(fc.y - tc.y) < 20) {
+            if (fc.x < tc.x) { fx = from.x + from.w; fy = fc.y; tx = to.x; ty = tc.y; }
+            else              { fx = from.x; fy = fc.y; tx = to.x + to.w; ty = tc.y; }
+          } else {
+            fx = fc.x; fy = from.y < to.y ? from.y + from.h : from.y;
+            tx = tc.x; ty = to.y < from.y ? to.y + to.h : to.y;
+          }
           const markerColor = color === C.blue ? 'blue' : color === C.amber ? 'amber' : 'slate';
           return (
             <line key={i} x1={fx} y1={fy} x2={tx} y2={ty}
@@ -399,6 +403,19 @@ function ERDDiagram({ meta, active, onSelect }: {
             />
           );
         })}
+
+        {/* Future Org Base — dashed placeholder at L2 */}
+        <g style={{ pointerEvents: 'none' }}>
+          <rect x={222} y={160} width={175} height={72} rx={8}
+            fill="#f8fafc" stroke="#94a3b8" strokeWidth={1.5}
+            strokeDasharray="6 3" opacity={0.6} />
+          <text x={309} y={186} textAnchor="middle"
+            fontSize={11} fontWeight={600} fill="#94a3b8">Future Org Base</text>
+          <text x={309} y={200} textAnchor="middle"
+            fontSize={9} fill="#94a3b8">from Component Spine</text>
+          <text x={309} y={216} textAnchor="middle"
+            fontSize={9} fill="#b0bec5">Supply Chain · Design · …</text>
+        </g>
 
         {/* Nodes */}
         {nodes.map(n => {
