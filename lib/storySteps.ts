@@ -38,10 +38,10 @@ export const STEPS: StoryStep[] = [
     act: 'Act I — Initiative Reporting',
     title: 'The Portfolio at a Glance',
     narrative:
-      "Kim's team tracks every strategic initiative in L1 — the single pane of glass that blends tech and non-tech programs across the entire enterprise. " +
-      "138 initiatives. One status vocabulary. One rollup view that leadership can actually trust. " +
-      "What you're seeing is live data from the Airtable base that powers the executive dashboard. " +
-      "Whether initiatives originate top-down from leadership or bottom-up from each org during AOP, they converge here.",
+      "This is the reporting layer built for Burton's WMT US-wide update — the single pane of glass that blends tech and non-tech programs across the entire enterprise. " +
+      "One status vocabulary. One rollup view that leadership can actually trust. " +
+      "Kim and Ashish drove the requirements. Ronny built the base. What you're seeing is live data from the Airtable base that powers the executive dashboard. " +
+      "Whether initiatives originate top-down from Burton's team or bottom-up from each org during AOP, they converge here.",
     baseId: BASE_L1,
     query: {
       tableId: 'tbl2ExbwxFOFpEtom',
@@ -101,8 +101,9 @@ export const STEPS: StoryStep[] = [
     title: 'Financial Picture',
     narrative:
       "Every initiative carries its financial story — projected annual revenue impact, cost savings, investment required, and ROI. " +
-      "These roll up automatically from the initiative records. No spreadsheets. No manual reconciliation. " +
-      "When a program lead updates their numbers, the executive view updates in real time.",
+      "For the POC, these are entered directly by program leads on each initiative record — no separate spreadsheet, no reconciliation step. " +
+      "When a lead updates their numbers, the executive view updates immediately. " +
+      "Automated rollup from child bases is the V2 path; for the May 12 moment, the value is having one place where finance lives alongside status.",
     baseId: BASE_L1,
     query: {
       tableId: 'tbl2ExbwxFOFpEtom',
@@ -265,7 +266,7 @@ export const STEPS: StoryStep[] = [
     act: 'Act IV — The Full System',
     title: 'Enterprise Airtable at Scale',
     narrative:
-      "Five Airtable bases. One enterprise planning system. " +
+      "Five Airtable bases. One enterprise planning system. Built for the May 12 reporting moment — Burton's first WMT US-wide status view from a single base. " +
       "L1 for portfolio visibility across tech and non-tech. Beacon and Lighthouse for delivery execution at the org level. " +
       "Orchestrator at L3 is the shared reference layer — canonical people, teams, and products distributed across every org base. Switchboard routes and resolves cross-org dependencies. " +
       "Every sync is automated. The direction of any sync can be reversed to match the business process — top-down planning, bottom-up proposals, or both. Every status rolls up. Every dependency is tracked. " +
